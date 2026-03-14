@@ -1,5 +1,5 @@
 # Environments
-.env
+config/.env
 .envrc
 .venv
 env/
@@ -12,3 +12,6 @@ venv.bak/
 
 # Visual Studio Code
  .vscode/
+
+# DB
+db/*

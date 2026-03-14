@@ -2,7 +2,8 @@ from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Path
-from models import Candle
+
+from app.models import Candle
 
 router = APIRouter()
 
