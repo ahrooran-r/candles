@@ -7,6 +7,7 @@ class Settings(BaseSettings):
     domain: str = None
     api_key: str = None
     demo_symbols: set[str] = None
+    historical_depth: int = None
 
     model_config = SettingsConfigDict(env_file=ALPHAVANTAGE_ENV_FILE)
 
