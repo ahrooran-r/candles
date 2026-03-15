@@ -21,7 +21,6 @@ class Repository:
         # This is like a try with resources in Java
         with self.database.get_connection() as connection:
             connection.executescript(schema_sql)
-            connection.commit()
             log.info("Executed schema script at: %s", schema_path)
 
     def get_monthly_candles(self, symbol: str, year: int) -> list[MonthlyCandle]:
@@ -52,7 +51,6 @@ class Repository:
 
         with self.database.get_connection() as connection:
             connection.executemany(query_template, values)
-            connection.commit()
 
 
 repository: Repository = Repository()

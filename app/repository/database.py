@@ -30,6 +30,20 @@ class Database:
         # When using Row, SQLite returns dictionary-like objects.
         conn.row_factory = Row
 
+        # https://sqlite.org/pragma.html#pragma_journal_mode
+
+        # 10MB cache
+        conn.execute("PRAGMA cache_size = -10240")
+
+        # similar to Postgres
+        conn.execute("PRAGMA journal_mode = WAL")
+
+        # This is supposed to be a read through cache.
+        # Coupled with WAL, this is enough. As its said in the docs.
+        conn.execute("PRAGMA synchronous = NORMAL")
+
+        # No need to create transactions. the with clause auto commits / rollbacks
+        # https://docs.python.org/3/library/sqlite3.html#how-to-use-the-connection-context-manager
         return conn
 
 

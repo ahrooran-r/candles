@@ -130,3 +130,29 @@ curl -L 'http://localhost:8001/symbols/IBM/annual/2025' -H 'Authorization: Basic
   exist in Alpha Vantage's data).
 - Alpha Vantage HTTP errors are surfaced via `httpx`'s `raise_for_status()`.
 - Connection and request timeouts are configurable in `config/alphavantage.env` (`CONNECT_TIMEOUT`, `REQUEST_TIMEOUT`).
+
+### Performance of the app
+
+Did a small load test using Postman with 10 virtual users over 10 minutes (peak profile).
+
+- Average response time: 15 ms
+- P90: 25 ms
+- P99: 42 ms
+
+![Load test results](docs/load_test_1.jpg)
+
+### Where to go from here
+
+- Right now there is some level of in-memory caching done in SQLite.
+However, we can tune this further by adding caching directly in router.
+
+- We can improve the handling of data for the current year by storing the last updated timestamp (right now we only store last refreshed date from Alphavantage). 
+  - In the current implementation, if the Alphavantage API updates the data for the current month multiple times within the same day (for example, once in the morning and again in the evening), and our system fetches the data only during the morning update, the later update will not be captured. 
+
+  - I realized this limitation late in the implementation process and therefore did not include this enhancement.
+
+- Add async capability. Fast API docs suggested defining methods with [async def](https://fastapi.tiangolo.com/tutorial/first-steps/). I am not familiar with this in Java before. I need to check that out.
+
+
+
+
