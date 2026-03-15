@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from datetime import date
-from typing import Any, Callable
+from typing import Any
 
 import httpx
 from httpx import Response
