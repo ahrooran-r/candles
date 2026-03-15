@@ -10,6 +10,13 @@ from app.models import MonthlyCandle
 
 
 class AlphavantageConnector:
+    """
+    I am not adding retry mechanisms here. This class basically reacts on incoming request.
+    Adding retry would slow down the response / error handling.
+    Just fail fast
+
+    I am also not adding rate limiting. Basically let Alphavantage return error message and throw exception.
+    """
 
     def __init__(self, symbol: str) -> None:
         self.symbol: str = symbol
