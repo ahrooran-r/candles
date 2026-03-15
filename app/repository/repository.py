@@ -2,7 +2,7 @@ from logging import getLogger, Logger
 from pathlib import Path
 from sqlite3 import Row, Cursor
 
-from app.models import MonthlyCandle
+from app.models import MonthlyCandle, SymbolStatistics
 from app.repository import database
 from app.util.PathUtils import DB_SCHEMA
 
@@ -38,6 +38,19 @@ class Repository:
                 candles.append(candle)
 
             return candles
+
+    def get_earliest_available_year(self, symbol: str) -> SymbolStatistics:
+        query_template: str = "select symbol, min(year) as earliest_year from ohlc_monthly where symbol = ?"
+
+        with self.database.get_connection() as connection:
+            # here if I give symbol as a single parameter, SQLite maps to individual characters and says 4 params provided
+            cursor: Cursor = connection.execute(query_template, (symbol,))
+            row: Row = cursor.fetchone()
+
+            dictionary: dict = dict(row)
+            statistics: SymbolStatistics = SymbolStatistics.model_validate(dictionary)
+
+            return statistics
 
     def upsert_ohlc(self, candles: list[MonthlyCandle]) -> None:
         query_template: str = "insert into ohlc_monthly (symbol, year, month, last_trading_date, high, low, volume) values (:symbol, :year, :month, :last_trading_date, :high, :low, :volume) on conflict (symbol, year, month) do update set last_trading_date = excluded.last_trading_date, high = excluded.high, low = excluded.low, volume = excluded.volume"

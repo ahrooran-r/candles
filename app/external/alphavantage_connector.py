@@ -24,7 +24,7 @@ class AlphavantageConnector:
 
     def get_monthly_candles(
             self,
-            filter: Callable[[MonthlyCandle], bool] = lambda candle: True
+            filter: Callable[[MonthlyCandle], bool]
     ) -> list[MonthlyCandle]:
         response_body: dict[str, Any] = self._request_timeseries_monthly()
         monthly_candles: list[MonthlyCandle] = self._process_monthly_candles(response_body, filter)

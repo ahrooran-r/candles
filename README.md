@@ -18,8 +18,12 @@ trading volume for a given symbol and year.
 
 ### Reason for choosing uv as a build tool
 
-I am not familiar with Python at all. I chose this simply because it was recommended in
+I am not familiar with Python at all. Initially I was thinking of using miniconda, as I was familiar with it during past university projects related to datascience. However, quick Google search told me that its not used to build server apps.
+
+So the two contenders left to me were venv and uv. I chose uv simply because it was recommended in
 the [FastAPI docs](https://fastapi.tiangolo.com/virtual-environments/#__tabbed_1_2)
+
+I can also see FastAPI itself was using uv as [build tool](https://github.com/fastapi/fastapi)
 
 ### Setting up the project
 

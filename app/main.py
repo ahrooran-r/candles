@@ -6,6 +6,7 @@ from fastapi import FastAPI
 
 import app.config.logging_config
 from app.config import server_settings
+from app.exceptions.exception_handler import register_exception_handlers
 from app.repository import database, repository
 from app.routers import candle_router
 
@@ -25,6 +26,8 @@ async def lifespan(app: FastAPI):
 
 
 app: FastAPI = FastAPI(lifespan=lifespan)
+
+register_exception_handlers(app)
 
 # LEARN: we must manually register routers
 app.include_router(candle_router, tags=["candle"])

@@ -9,7 +9,12 @@ class CandleAggregator:
         self.year: int = year
 
         if not monthly_candles:
-            raise CandlesNotFoundError(symbol=symbol, year=year)
+            raise CandlesNotFoundError.not_found_for_year(symbol=symbol, year=year)
+
+        monthly_candles = [candle for candle in monthly_candles if candle.year == year]
+
+        if not monthly_candles:
+            raise CandlesNotFoundError.not_found_for_year(symbol=symbol, year=year)
 
         self.monthly_candles: list[MonthlyCandle] = monthly_candles
         self.high: float = self.monthly_candles[0].high

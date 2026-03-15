@@ -16,3 +16,8 @@ class MonthlyCandle(BaseModel):
     def get_last_trading_date(self) -> str:
         last_trading_date_string: str = self.last_trading_date.isoformat()
         return last_trading_date_string
+
+
+class SymbolStatistics(BaseModel):
+    symbol: str | None
+    earliest_year: int | None
