@@ -76,7 +76,7 @@ class AlphavantageConnector:
         # https://www.python-httpx.org/advanced/timeouts/
         timeout = httpx.Timeout(alphavantage_settings.request_timeout, connect=alphavantage_settings.connect_timeout)
 
-        response: Response = httpx.get(url=self.url, params=query_params)
+        response: Response = httpx.get(url=self.url, params=query_params, timeout=timeout)
         response.raise_for_status()
 
         body: dict = response.json()
