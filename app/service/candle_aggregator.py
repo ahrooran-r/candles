@@ -25,7 +25,7 @@ class CandleAggregator:
 
             self._aggregate_row(monthly_candle)
 
-        yearly_candle: YearlyCandle = YearlyCandle(high=self.high, low=self.low, volume=self.volume)
+        yearly_candle: YearlyCandle = YearlyCandle(high=str(self.high), low=str(self.low), volume=str(self.volume))
         return yearly_candle
 
     def _aggregate_row(self, candle: MonthlyCandle) -> None:
