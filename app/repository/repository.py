@@ -2,6 +2,7 @@ from logging import getLogger, Logger
 from pathlib import Path
 from sqlite3 import Row, Cursor
 
+from app.models import MonthlyCandle
 from app.repository import database
 from app.util.PathUtils import DB_SCHEMA
 
@@ -24,15 +25,26 @@ class Repository:
             log.info("Executed schema script at: %s", schema_path)
 
     def get_monthly_candles(self, symbol: str, year: int) -> list[Row] | None:
-        symbol = symbol.upper()
-        self._validate_year(year)
-
         query_template: str = "select * from ohlc_monthly where symbol = ? and year = ? order by month"
 
         with self.database.get_connection() as connection:
             cursor: Cursor = connection.execute(query_template, (symbol, year))
             rows: list[Row] = cursor.fetchall()
             return rows
+
+    def insert_ohlc(self, ohlc: list[MonthlyCandle]) -> None:
+        query_template: str = "insert or ignore into ohlc_monthly (symbol, year, month, last_trading_date, high, low, volume) values (:symbol, :year, :month, :last_trading_date, :high, :low, :volume)"
+        values: list[dict[str, str]] = [
+            {
+                **row.model_dump(),
+                "last_trading_date": row.last_trading_date.isoformat(),
+            }
+            for row in ohlc
+        ]
+
+        with self.database.get_connection() as connection:
+            connection.executemany(query_template, values)
+            connection.commit()
 
 
 repository: Repository = Repository()

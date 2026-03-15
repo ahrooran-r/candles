@@ -4,7 +4,8 @@ from typing import Annotated
 from fastapi import APIRouter, Path
 
 from app.config import alphavantage_settings
-from app.models import Candle
+from app.models import YearlyCandle
+from app.service import CandleService
 
 router = APIRouter()
 
@@ -13,7 +14,7 @@ router = APIRouter()
 def yearly_candle(
         symbol: Annotated[str, Path(min_length=1, max_length=50)],
         year: Annotated[int, Path(ge=alphavantage_settings.historical_depth, le=datetime.now().year)],
-) -> Candle:
+) -> YearlyCandle:
     """
     :param symbol: The name of the equity of your choice. For example: symbol=IBM
     :param year: should be between historical depth and current year
@@ -22,5 +23,12 @@ def yearly_candle(
 
     symbol = symbol.upper()
 
-    # LEARN: pydantic requires named arguments ?
-    return Candle(high=23.0, low=12.4, volume=120)
+    candle_service: CandleService = CandleService(symbol, year)
+    candle: YearlyCandle
+    try:
+        candle = candle_service.get_yearly_candle()
+    except ValueError as e:
+        candle_service.update_db()
+        candle = candle_service.get_yearly_candle()
+
+    return candle

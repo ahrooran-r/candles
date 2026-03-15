@@ -1,25 +1,27 @@
 from sqlite3 import Row
 
-from app.models import Candle
+from app.models import YearlyCandle
 
 
 class CandleAggregator:
 
     def __init__(self, rows: list[Row]):
-        self.rows: list[Row] = rows
-        self.high: float = 0.0
-        self.low: float = 0.0
-        self.volume: int = 0
+        if not rows:
+            raise ValueError("rows must not be empty")
 
-    def aggregate(self) -> Candle:
-        for row in self.rows:
+        self.rows: list[Row] = rows
+        self.high: float = self.rows[0]["high"]
+        self.low: float = self.rows[0]["low"]
+        self.volume: int = self.rows[0]["volume"]
+
+    def aggregate(self) -> YearlyCandle:
+        for row in self.rows[1:]:
             self.aggregate_row(row)
 
-        candle: Candle = Candle(high=self.high, low=self.low, volume=self.volume)
+        candle: YearlyCandle = YearlyCandle(high=self.high, low=self.low, volume=self.volume)
         return candle
 
     def aggregate_row(self, row: Row) -> None:
-
         high: float = row["high"]
         if high > self.high:
             self.high = high
