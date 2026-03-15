@@ -1,6 +1,7 @@
 import logging
+from app.config import server_settings
 
 logging.basicConfig(
-    level=logging.DEBUG,
+    level=server_settings.log_level,
     format="%(asctime)s [%(levelname)s] %(name)s : %(message)s"
 )

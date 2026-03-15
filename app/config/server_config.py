@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     # I don't want to add default port. Let it fail fast if config is missing.
     port: int = None
     password: str = None
+    log_level: str = None
 
     model_config = SettingsConfigDict(env_file=SERVER_ENV_FILE)
 

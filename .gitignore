@@ -1,7 +1,7 @@
 # Environments
 config/.env
 .envrc
-.venv
+.venv*
 env/
 ENV/
 env.bak/

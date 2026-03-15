@@ -37,7 +37,7 @@ On Linux (I have used WSL to test. This script may fail in an actual Linux envir
 Please [refer](https://fastapi.tiangolo.com/virtual-environments/#__tabbed_1_2) here for troubleshooting):
 
 ```bash
-./activate.sh
+source ./activate.sh
 ```
 
 **2. Set your Alpha Vantage API key**
