@@ -1,3 +1,5 @@
+# The script is generated completely by ChatGPT
+
 # Ensure script runs from the project root
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location $projectRoot
