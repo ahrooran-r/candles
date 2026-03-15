@@ -1,34 +1,41 @@
-from sqlite3 import Row
-
-from app.models import YearlyCandle
+from app.exceptions import CandlesNotFoundError
+from app.models import YearlyCandle, MonthlyCandle
 
 
 class CandleAggregator:
 
-    def __init__(self, rows: list[Row]):
-        if not rows:
-            raise ValueError("rows must not be empty")
+    def __init__(self, symbol: str, year: int, monthly_candles: list[MonthlyCandle]) -> None:
+        self.symbol: str = symbol
+        self.year: int = year
 
-        self.rows: list[Row] = rows
-        self.high: float = self.rows[0]["high"]
-        self.low: float = self.rows[0]["low"]
-        self.volume: int = self.rows[0]["volume"]
+        if not monthly_candles:
+            raise CandlesNotFoundError(symbol=symbol, year=year)
+
+        self.monthly_candles: list[MonthlyCandle] = monthly_candles
+        self.high: float = self.monthly_candles[0].high
+        self.low: float = self.monthly_candles[0].low
+        self.volume: int = self.monthly_candles[0].volume
 
     def aggregate(self) -> YearlyCandle:
-        for row in self.rows[1:]:
-            self.aggregate_row(row)
+        for monthly_candle in self.monthly_candles[1:]:
 
-        candle: YearlyCandle = YearlyCandle(high=self.high, low=self.low, volume=self.volume)
-        return candle
+            if monthly_candle.symbol != self.symbol or monthly_candle.year != self.year:
+                # avoid any faulty record
+                continue
 
-    def aggregate_row(self, row: Row) -> None:
-        high: float = row["high"]
+            self._aggregate_row(monthly_candle)
+
+        yearly_candle: YearlyCandle = YearlyCandle(high=self.high, low=self.low, volume=self.volume)
+        return yearly_candle
+
+    def _aggregate_row(self, candle: MonthlyCandle) -> None:
+        high: float = candle.high
         if high > self.high:
             self.high = high
 
-        low: float = row["low"]
+        low: float = candle.low
         if low < self.low:
             self.low = low
 
-        volume: int = row["volume"]
+        volume: int = candle.volume
         self.volume += volume

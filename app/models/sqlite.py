@@ -3,12 +3,6 @@ from datetime import date
 from pydantic import BaseModel
 
 
-class YearlyCandle(BaseModel):
-    high: float
-    low: float
-    volume: int
-
-
 class MonthlyCandle(BaseModel):
     symbol: str
     year: int
@@ -18,3 +12,7 @@ class MonthlyCandle(BaseModel):
     high: float
     low: float
     volume: int
+
+    def get_last_trading_date(self) -> str:
+        last_trading_date_string: str = self.last_trading_date.isoformat()
+        return last_trading_date_string

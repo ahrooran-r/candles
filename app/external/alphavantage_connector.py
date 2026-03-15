@@ -1,11 +1,10 @@
 from datetime import date
-from typing import Any
+from typing import Any, Callable
 
 import httpx
 from httpx import Response
 
 from app.config import alphavantage_settings
-
 from app.models import MonthlyCandle
 
 
@@ -13,15 +12,21 @@ class AlphavantageConnector:
 
     def __init__(self, symbol: str) -> None:
         self.symbol: str = symbol
-        self.function = "TIME_SERIES_MONTHLY"
         self.url = f"https://{alphavantage_settings.domain}/query"
 
-    def get_monthly_candles(self) -> list[MonthlyCandle]:
-        response_body: dict[str, Any] = self._request_monthly_candles()
-        monthly_candles: list[MonthlyCandle] = self._process_monthly_candles(response_body)
+    def get_monthly_candles(
+            self,
+            filter: Callable[[MonthlyCandle], bool] = lambda candle: True
+    ) -> list[MonthlyCandle]:
+        response_body: dict[str, Any] = self._request_timeseries_monthly()
+        monthly_candles: list[MonthlyCandle] = self._process_monthly_candles(response_body, filter)
         return monthly_candles
 
-    def _process_monthly_candles(self, body: dict[str, Any]) -> list[MonthlyCandle]:
+    def _process_monthly_candles(
+            self,
+            body: dict[str, Any],
+            filter: Callable[[MonthlyCandle], bool]
+    ) -> list[MonthlyCandle]:
         monthly_time_series: dict[str, dict[str, str]] = body["Monthly Time Series"]
 
         rows: list[MonthlyCandle] = []
@@ -38,7 +43,7 @@ class AlphavantageConnector:
             _volume: str = ohlc["5. volume"]
             volume: int = int(_volume)
 
-            row = MonthlyCandle(
+            monthly_candle: MonthlyCandle = MonthlyCandle(
                 symbol=self.symbol,
                 year=trading_date.year,
                 month=trading_date.month,
@@ -48,13 +53,14 @@ class AlphavantageConnector:
                 volume=volume,
             )
 
-            rows.append(row)
+            if filter(monthly_candle):
+                rows.append(monthly_candle)
 
         return rows
 
-    def _request_monthly_candles(self) -> dict[str, Any]:
+    def _request_timeseries_monthly(self) -> dict[str, Any]:
         query_params: dict[str, str] = {
-            "function": self.function,
+            "function": "TIME_SERIES_MONTHLY",
             "symbol": self.symbol,
             "apikey": alphavantage_settings.api_key,
         }
